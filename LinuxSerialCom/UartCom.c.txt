@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <termios.h>
+#include <unistd.h>
+
+
+#define SERIAL_DEVICE "/dev/ttyS0"
+
+const char COM1[] = SERIAL_DEVICE;
+
+int main(){
+
+	struct termios serialPort_config;
+	int fd;
+	int err_value;
+
+	//Serial Device Open
+		fd = open(SERIAL_DEVICE, O_RDWR | O_NOCTTY | O_NDELAY);
+		if(fd < 0){
+			printf("Serial device opening error\n");
+		}
+		else{
+			printf("Serial device opened\n");
+		}
+
+	
+	//Get Serial Port Configs
+		err_value = tcgetattr(fd, &serialPort_config);
+		if(err_value < 0){
+			printf("Serial port configs getting error\n");
+		}
+		else{
+			printf("Serial port configs gotten\n");
+		}
+
+	//Set Serial Port Baud Rate
+		err_value = cfsetspeed(&serialPort_config, B1152000);
+		if(err_value < 0){
+			printf("Serial port baud rate setting error\n");
+		}
+		else{
+			printf("Serial port baud rate set\n");
+		}
+
+	//Serial Port Configs
+		serialPort_config.c_cflag |= (CS8 | PARENB | PARODD | CREAD);
+
+	//Set Serial Port Configs
+		err_value = tcsetattr(fd, TCSANOW, &serialPort_config);
+		if(err_value < 0){
+			printf("Serial port configs setting error\n");
+		}
+		else{
+			printf("Serial port configs set\n");
+		}
+
+
+		
+
+	return 0;
+}
